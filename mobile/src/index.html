@@ -953,83 +953,73 @@ document.getElementById('startBtn').addEventListener('click',startGame);
 document.getElementById('restartBtn').addEventListener('click',startGame);
 requestAnimationFrame(loop);
 
-// Touch Controls Logic
-const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+
+<script>
+// Modern Touch Controls
+let touchOrigin = null;
+let lastTapTime = 0;
+let doubleTapBoost = false;
+let isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
 if (isTouchDevice) {
-    document.getElementById('touchControls').style.display = 'block';
-    document.getElementById('energyLabel').style.bottom = '210px';
-    document.getElementById('energyBar').style.bottom = '195px';
+    window.addEventListener('touchstart', (e) => {
+        if (game.state !== 'playing') return;
+        
+        const now = Date.now();
+        
+        // 2 fingers OR quick double tap = BOOST
+        if (e.touches.length > 1 || (now - lastTapTime < 300)) {
+            keys[' '] = true;
+            if (e.touches.length <= 1) doubleTapBoost = true;
+        }
+        lastTapTime = now;
+
+        // Establish movement origin
+        if (e.touches.length === 1 && !touchOrigin) {
+            touchOrigin = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+        if (game.state !== 'playing' || !touchOrigin) return;
+        // Optional: prevent default to stop page scrolling
+        e.preventDefault();
+        
+        const touch = e.touches[0];
+        const dx = touch.clientX - touchOrigin.x;
+        const dy = touch.clientY - touchOrigin.y;
+        
+        const deadzone = 15;
+        keys['d'] = dx > deadzone;
+        keys['a'] = dx < -deadzone;
+        keys['s'] = dy > deadzone;
+        keys['w'] = dy < -deadzone;
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) {
+            touchOrigin = null;
+            keys['w'] = false; keys['a'] = false; keys['s'] = false; keys['d'] = false;
+            keys[' '] = false;
+            doubleTapBoost = false;
+        } else if (e.touches.length === 1) {
+            if (!doubleTapBoost) {
+                keys[' '] = false;
+            }
+        }
+    }, { passive: false });
+    
+    window.addEventListener('touchcancel', (e) => {
+        touchOrigin = null;
+        keys['w'] = false; keys['a'] = false; keys['s'] = false; keys['d'] = false;
+        keys[' '] = false;
+        doubleTapBoost = false;
+    }, { passive: false });
 }
-
-const joystickZone = document.getElementById('joystickZone');
-const joystickKnob = document.getElementById('joystickKnob');
-let joystickActive = false;
-let joystickCenter = { x: 0, y: 0 };
-const maxRadius = 35; // The max distance the knob can travel
-
-joystickZone.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    joystickActive = true;
-    const rect = joystickZone.getBoundingClientRect();
-    joystickCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-    handleJoystick(e.touches[0]);
-}, { passive: false });
-
-joystickZone.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    if (joystickActive) {
-        handleJoystick(e.touches[0]);
-    }
-}, { passive: false });
-
-joystickZone.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    joystickActive = false;
-    joystickKnob.style.transform = `translate(-50%, -50%)`;
-    keys['w'] = false; keys['a'] = false; keys['s'] = false; keys['d'] = false;
-}, { passive: false });
-
-function handleJoystick(touch) {
-    let dx = touch.clientX - joystickCenter.x;
-    let dy = touch.clientY - joystickCenter.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    if (distance > maxRadius) {
-        dx = (dx / distance) * maxRadius;
-        dy = (dy / distance) * maxRadius;
-    }
-    
-    joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-    
-    keys['d'] = dx > 15;
-    keys['a'] = dx < -15;
-    keys['s'] = dy > 15;
-    keys['w'] = dy < -15;
-}
-
-const btnBoost = document.getElementById('btnBoost');
-btnBoost.addEventListener('touchstart', (e) => { e.preventDefault(); keys[' '] = true; }, { passive: false });
-btnBoost.addEventListener('touchend', (e) => { e.preventDefault(); keys[' '] = false; }, { passive: false });
-
-const btnSlow = document.getElementById('btnSlow');
-btnSlow.addEventListener('touchstart', (e) => { e.preventDefault(); keys['shift'] = true; }, { passive: false });
-btnSlow.addEventListener('touchend', (e) => { e.preventDefault(); keys['shift'] = false; }, { passive: false });
 
 </script>
-<!-- Mobile Touch Controls -->
-<div id="touchControls" style="position:absolute;bottom:0;left:0;width:100%;height:200px;pointer-events:none;z-index:6;display:none;">
-    <!-- Left Side: Virtual Joystick -->
-    <div id="joystickZone" style="position:absolute;bottom:20px;left:20px;width:150px;height:150px;pointer-events:auto;">
-        <div id="joystickBase" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;border-radius:50%;border:2px solid rgba(0,255,204,0.3);background:rgba(0,0,0,0.2);"></div>
-        <div id="joystickKnob" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;border-radius:50%;background:rgba(0,255,204,0.6);border:2px solid #00ffcc;box-shadow:0 0 15px #00ffcc;"></div>
-    </div>
-    <!-- Right Side: Action Buttons -->
-    <div style="position:absolute;bottom:40px;right:30px;display:flex;gap:20px;pointer-events:auto;">
-        <button id="btnSlow" style="width:70px;height:70px;border-radius:50%;background:rgba(170,136,255,0.3);border:2px solid #aa88ff;color:#fff;font-size:0.7em;font-weight:bold;letter-spacing:0.1em;box-shadow:0 0 15px #aa88ff;margin-top:0;">SLOW</button>
-        <button id="btnBoost" style="width:90px;height:90px;border-radius:50%;background:rgba(0,255,204,0.3);border:2px solid #00ffcc;color:#fff;font-size:0.7em;font-weight:bold;letter-spacing:0.1em;box-shadow:0 0 20px #00ffcc;margin-top:0;">BOOST</button>
-    </div>
-</div>
 
 <script src="bridge.js"></script>
 </body>
-</html>
+</html>\n
