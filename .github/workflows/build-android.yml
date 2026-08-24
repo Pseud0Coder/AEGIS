@@ -23,8 +23,8 @@ jobs:
       - name: Install dependencies
         run: npm install
         working-directory: mobile
-      - name: Copy web assets to native project
-        run: npx cap copy
+      - name: Copy web assets and sync native plugins
+        run: npx cap sync
         working-directory: mobile
       - name: Make Gradlew Executable
         run: chmod +x ./gradlew
