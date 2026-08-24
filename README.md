@@ -1,5 +1,7 @@
 # AEGIS Orbital Defense
 
+Aegis (n.): A shield, yet here, a verb. An arcade survival game built on the tension of perpetual motion and resource friction. You do not fire; you time the sweep. Includes reality-inverting "Death Levels"
+
 A monorepo for the AEGIS web and mobile versions.
 
 ## Project Structure
