@@ -1,40 +1,52 @@
-const { AdMob } = window.Capacitor ? window.Capacitor.Plugins : {};
+const { AdMob } = window.Capacitor?.Plugins || {};
+
+function isPremium() {
+  try {
+    return isPremium();
+  } catch (error) {
+    console.warn('Unable to read premium status', error);
+    return false;
+  }
+}
+
+function hideRemoveAdsButton() {
+  const btn = document.getElementById('removeAdsBtn');
+  if (btn) btn.style.display = 'none';
+}
 
 async function initAds() {
-  if (!AdMob) return;
-  
-  const isPremium = localStorage.getItem('aegis_premium') === 'true';
-  if (isPremium) {
-    console.log("User is premium. No ads will be shown.");
-    const btn = document.getElementById("removeAdsBtn");
-    if (btn) btn.style.display = "none";
+  if (!AdMob || isPremium()) {
+    if (isPremium()) hideRemoveAdsButton();
     return;
   }
 
-  await AdMob.initialize({
-    requestTrackingAuthorization: true,
-    initializeForTesting: true,
-  });
+  try {
+    await AdMob.initialize({
+      requestTrackingAuthorization: true,
+      initializeForTesting: true,
+    });
 
-  const options = {
-    adId: 'ca-app-pub-3940256099942544/6300978111',
-    adSize: 'BANNER',
-    position: 'BOTTOM_CENTER',
-    margin: 0,
-    isTesting: true,
-  };
-  
-  await AdMob.showBanner(options);
-  
-  AdMob.addListener('bannerSize', (info) => {
-    const isPremium = localStorage.getItem('aegis_premium') === 'true';
-    if (!isPremium) {
-      const bannerHeight = info.height;
-      document.getElementById('game').style.height = `calc(100% - ${bannerHeight}px)`;
-      // Trigger canvas resize
-      window.dispatchEvent(new Event('resize'));
-    }
-  });
+    await AdMob.showBanner({
+      adId: 'ca-app-pub-3940256099942544/6300978111',
+      adSize: 'BANNER',
+      position: 'BOTTOM_CENTER',
+      margin: 0,
+      isTesting: true,
+    });
+
+    await AdMob.addListener('bannerSize', (info) => {
+      if (!isPremium() && info?.height) {
+        const gameCanvas = document.getElementById('game');
+        if (gameCanvas) {
+          gameCanvas.style.height = `calc(100% - ${info.height}px)`;
+          window.dispatchEvent(new Event('resize'));
+        }
+      }
+    });
+  } catch (error) {
+    // Ads are optional; never prevent the game from starting.
+    console.error('AdMob initialization failed', error);
+  }
 }
 
 window.checkPremiumStatus = async function() {
@@ -44,32 +56,10 @@ window.checkPremiumStatus = async function() {
 };
 
 window.purchasePremium = async function() {
-  try {
-    // IAP plugin logic here to purchase 'aegis_premium_unlock'
-    console.log("Mock purchase successful!");
-    localStorage.setItem('aegis_premium', 'true');
-    
-    if (AdMob) {
-      await AdMob.hideBanner().catch(() => {});
-      await AdMob.removeBanner().catch(() => {});
-    }
-    
-    // Reset canvas height
-    const gameCanvas = document.getElementById('game');
-    gameCanvas.style.height = "100%";
-    window.dispatchEvent(new Event('resize'));
-    
-    // Hide the button
-    const btn = document.getElementById('removeAdsBtn');
-    if (btn) btn.style.display = 'none';
-    
-    alert("Premium Unlocked! Ads removed.");
-    return true;
-  } catch (error) {
-    console.error("Purchase failed", error);
-    alert("Purchase failed.");
-    return false;
-  }
+  // There is no billing plugin in this build. Do not claim a purchase
+  // succeeded or persist premium access without a verified transaction.
+  alert('Ad-free upgrade is not available in this build yet.');
+  return false;
 };
 
 window.addEventListener('load', () => {
