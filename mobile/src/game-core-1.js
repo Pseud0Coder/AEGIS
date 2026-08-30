@@ -172,6 +172,7 @@ function startGame(){
     game.spawnTimer=1;game.powerupTimer=8;game.shake=0;game.flashAlpha=0;
     game.arms=1;game.pulseLevel=0;game.pulseTimer=0;game.pulseActive=false;game.pulseRadius=0;
     game.fieryTimer=0;game.magnetTimer=0;game.shields=0;game.scoreDrain=0;
+    timeslowTimer=0;frenzyTimer=0;
     game.deathLevel={active:false,warning:0,timer:0,type:null,nextCheck:180,count:0,shielded:false,scoreLost:0};
     game.thresholdsHit=new Set();
     player.x=W/2;player.y=H/2;player.vx=0;player.vy=0;player.energy=100;player.invulnerable=0;
@@ -181,6 +182,8 @@ function startGame(){
     document.getElementById('menuScreen').classList.add('hidden');
     document.getElementById('gameoverScreen').classList.add('hidden');
     document.getElementById('hud').classList.remove('hidden');
+    document.getElementById('powerupIndicators').classList.remove('hidden');
+    document.getElementById('powerupIndicators').innerHTML='';
     document.getElementById('energyBar').classList.remove('hidden');
     document.getElementById('energyLabel').classList.remove('hidden');
     document.getElementById('pulseBar').classList.add('hidden');
@@ -199,6 +202,11 @@ function gameOver(){
     document.getElementById('newRecord').classList.toggle('hidden',!newRec);
     document.getElementById('gameoverScreen').classList.remove('hidden');
     document.getElementById('hud').classList.add('hidden');
+    document.getElementById('powerupIndicators').classList.add('hidden');
+    document.getElementById('powerupIndicators').innerHTML='';
+    document.getElementById('deathWarningContainer').innerHTML='';
+    document.getElementById('deathBannerContainer').innerHTML='';
+    document.getElementById('thresholdContainer').innerHTML='';
     document.getElementById('energyBar').classList.add('hidden');
     document.getElementById('energyLabel').classList.add('hidden');
     document.getElementById('pulseBar').classList.add('hidden');
