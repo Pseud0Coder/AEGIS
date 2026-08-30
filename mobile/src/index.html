@@ -6,9 +6,10 @@
 <title>AEGIS — Orbital Defense</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--safe-top:max(12px,env(safe-area-inset-top));--safe-right:max(12px,env(safe-area-inset-right));--safe-bottom:max(16px,env(safe-area-inset-bottom));--safe-left:max(12px,env(safe-area-inset-left))}
+:root{--safe-top:max(12px,env(safe-area-inset-top));--safe-right:max(12px,env(safe-area-inset-right));--safe-bottom:max(16px,env(safe-area-inset-bottom));--safe-left:max(12px,env(safe-area-inset-left));--ad-banner-height:0px}
 html,body{width:100%;height:100%;min-height:100%;overflow:hidden;background:#050510;font-family:'Courier New',monospace;color:#fff}
 body{cursor:crosshair;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:none}
+#gameRoot{position:fixed;inset:0 0 var(--ad-banner-height) 0;overflow:hidden}
 #game{display:block;position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .overlay{position:absolute;inset:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);pointer-events:none;z-index:10}
 .panel{background:rgba(5,5,20,.92);border:2px solid;padding:clamp(24px,5vw,40px) clamp(16px,6vw,60px);text-align:center;pointer-events:auto;backdrop-filter:blur(12px);position:relative;width:min(92vw,620px);max-width:100%;max-height:calc(100% - 24px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
@@ -42,6 +43,16 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
 .pulse-fill{height:100%;background:linear-gradient(90deg,#aa88ff,#ff44ff);transition:width .1s;box-shadow:0 0 15px #aa88ff}
 .energy-label{position:absolute;bottom:calc(var(--safe-bottom) + 29px);left:50%;transform:translateX(-50%);font-size:.7em;letter-spacing:.3em;opacity:.5;pointer-events:none;z-index:5}
 .hidden{display:none!important}
+.pause-button{position:absolute;top:calc(var(--safe-top) + 58px);right:var(--safe-right);z-index:9;margin:0;padding:8px 12px;min-height:40px;font-size:.72rem;color:#00ffcc;background:rgba(5,5,20,.8)}
+.pause-panel{border-color:#00ffcc;color:#00ffcc}
+.pause-panel button{display:block;margin:14px auto 0}
+.touch-controls{position:absolute;inset:0;pointer-events:none;z-index:8}
+.move-pad{position:absolute;left:var(--safe-left);bottom:var(--safe-bottom);width:132px;height:132px;border:2px solid #00ffcc88;border-radius:50%;background:#051520aa;box-shadow:inset 0 0 28px #00ffcc22;pointer-events:auto;touch-action:none}
+.move-knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:#00ffccbb;box-shadow:0 0 24px #00ffcc;pointer-events:none}
+.action-controls{position:absolute;right:var(--safe-right);bottom:var(--safe-bottom);display:flex;gap:12px;align-items:flex-end;pointer-events:auto}
+.touch-action{width:82px;height:82px;margin:0;padding:0;border-radius:50%;font-size:.7rem;letter-spacing:.08em;background:#050514cc;touch-action:none}
+.touch-action.boost{color:#00ffcc}.touch-action.slow{color:#aa88ff}
+.touch-action.active{background:currentColor;color:#050510;transform:scale(.94);box-shadow:0 0 30px currentColor}
 .powerup-indicators{position:absolute;top:calc(var(--safe-top) + 53px);left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:none;z-index:5;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px)}
 .pwr-ind{padding:5px 10px;border:1px solid;font-size:.7em;letter-spacing:.12em;background:rgba(5,5,20,.6);backdrop-filter:blur(8px);font-weight:700}
 .death-warning{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(92vw,560px);padding:0 10px;text-align:center;pointer-events:none;z-index:8}
@@ -66,17 +77,33 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
  .combo{grid-column:3 / span 2}
  .instructions div{margin:6px 0}
  .key{padding:3px 6px;margin:0 1px}
+ .energy-bar{bottom:calc(var(--safe-bottom) + 154px);width:min(280px,calc(100vw - 32px))}
+ .pulse-bar{bottom:calc(var(--safe-bottom) + 174px)}
+ .energy-label{bottom:calc(var(--safe-bottom) + 167px)}
+ .death-stats{bottom:calc(var(--safe-bottom) + 190px)}
 }
 @media(max-height:620px){
  .panel{padding-top:16px;padding-bottom:16px}
  .subtitle{margin-bottom:12px}
  .instructions{margin:10px 0}
  button{margin-top:12px}
+ .move-pad{width:112px;height:112px}
+ .touch-action{width:70px;height:70px}
+ .energy-bar{bottom:calc(var(--safe-bottom) + 128px)}
+ .pulse-bar{bottom:calc(var(--safe-bottom) + 148px)}
+ .energy-label{bottom:calc(var(--safe-bottom) + 141px)}
+}
+@media(max-width:380px){
+ .move-pad{width:120px;height:120px}
+ .action-controls{flex-direction:column;gap:8px}
+ .touch-action{width:66px;height:66px}
 }
 </style>
 </head>
 <body onload="(function(s){function n(){if(!s.length)return;var e=document.createElement('scr'+'ipt');e.src=s.shift();e.onload=n;document.body.appendChild(e)}n()})(['game-core-1.js','game-core-2.js','touch-controls.js','bridge.js'])">
+<div id="gameRoot">
 <canvas id="game"></canvas>
+<button class="pause-button hidden" id="pauseBtn" aria-label="Pause game">Ⅱ PAUSE</button>
 <div class="hud hidden" id="hud">
     <div class="hud-left">
         <div class="score">SCORE<span id="score">0</span></div>
@@ -101,9 +128,9 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
         <h1>AEGIS</h1>
         <div class="subtitle">ORBITAL DEFENSE</div>
         <div class="instructions">
-            <div><span class="key">W A S D</span> / <span class="key">↑ ← ↓ →</span> &mdash; Move Guardian</div>
-            <div><span class="key">SPACE</span> &mdash; Accelerate Blade</div>
-            <div><span class="key">SHIFT</span> &mdash; Decelerate Blade</div>
+            <div>Drag the left movement pad to move the Guardian</div>
+            <div>Hold <span class="key">BOOST</span> to accelerate the blade</div>
+            <div>Hold <span class="key">SLOW</span> to decelerate the blade</div>
         </div>
         <div style="opacity:.5;font-size:.8em;margin-top:12px;line-height:1.6">
             A blade orbits your core. Time its speed to intercept threats.<br>
@@ -112,7 +139,6 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
             Explosive tiles grant fiery chain reactions. Magnet tiles pull everything in.
         </div>
         <button id="startBtn">BEGIN</button>
-        <button id="removeAdsBtn" onclick="if(window.purchasePremium) window.purchasePremium()" style="display:block; margin: 15px auto 0; font-size: 0.6em; padding: 10px 20px; color: #ffaa44; border-color: #ffaa44; letter-spacing: .2em;">REMOVE ADS (COMING SOON)</button>
     </div>
 </div>
 <div class="overlay hidden" id="gameoverScreen">
@@ -127,6 +153,21 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
         </div>
         <button id="restartBtn">REINITIALIZE</button>
     </div>
+</div>
+<div class="overlay hidden" id="pauseScreen" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <div class="panel pause-panel">
+        <h1 id="pauseTitle">PAUSED</h1>
+        <button id="resumeBtn">RESUME</button>
+        <button id="menuBtn">END RUN</button>
+    </div>
+</div>
+<div class="touch-controls hidden" id="touchControls" aria-label="Touch game controls">
+    <div class="move-pad" id="movePad" role="application" aria-label="Movement pad"><div class="move-knob" id="moveKnob"></div></div>
+    <div class="action-controls">
+        <button class="touch-action slow" id="slowTouchBtn" aria-label="Hold to slow blade">SLOW</button>
+        <button class="touch-action boost" id="boostTouchBtn" aria-label="Hold to boost blade">BOOST</button>
+    </div>
+</div>
 </div>
 </body>
 </html>
