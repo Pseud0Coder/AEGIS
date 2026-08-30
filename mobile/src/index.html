@@ -58,8 +58,12 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
 @media(max-width:600px){
  .panel{width:calc(100vw - 24px);padding:clamp(22px,6vw,32px) 16px}
  .menu h1,.gameover h1{font-size:clamp(2.15rem,12vw,3.25rem)}
- .hud{padding-left:8px;padding-right:8px}
- .hud-left,.hud-right{flex-basis:100%;justify-content:space-between}
+ .hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;padding-left:8px;padding-right:8px}
+ .hud-left,.hud-right{display:contents}
+ .hud>div>div{min-width:0;width:100%;padding:7px 5px;text-align:center;overflow:hidden;text-overflow:ellipsis}
+ .hud>div>div span{display:block;margin:2px 0 0;font-size:1.08em}
+ .score{grid-column:1 / span 2}
+ .combo{grid-column:3 / span 2}
  .instructions div{margin:6px 0}
  .key{padding:3px 6px;margin:0 1px}
 }
