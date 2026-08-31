@@ -1,0 +1,1 @@
+export const sharedFiles=['game-rules.js','game-core-1.js','game-core-2.js'];

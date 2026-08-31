@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23050510'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2300f5d4' stroke-width='5'/%3E%3C/svg%3E">
 <title>AEGIS — Orbital Defense</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -26,24 +27,30 @@ h1{font-size:clamp(2rem,10vw,3.8rem);line-height:1;letter-spacing:clamp(.1em,1.5
 .key{display:inline-block;padding:3px 7px;border:1px solid currentColor;border-radius:3px;margin:0 2px;font-size:.8em;background:rgba(255,255,255,.05)}
 button{background:transparent;border:2px solid currentColor;color:inherit;font-family:inherit;font-size:clamp(.85rem,3.8vw,1.05rem);padding:12px clamp(16px,6vw,36px);min-height:48px;max-width:100%;cursor:pointer;letter-spacing:clamp(.1em,1vw,.3em);transition:all .25s;margin-top:20px;font-weight:700;touch-action:manipulation;overflow-wrap:anywhere}
 button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentColor;transform:scale(1.05)}
-.hud{position:absolute;top:0;left:0;width:100%;padding:var(--safe-top) var(--safe-right) 8px var(--safe-left);display:flex;justify-content:space-between;pointer-events:none;z-index:5;font-size:clamp(.62rem,2.2vw,.95rem);letter-spacing:.06em;flex-wrap:wrap;gap:6px}
-.hud-left,.hud-right{display:flex;gap:6px;flex:1 1 auto;min-width:0;flex-wrap:wrap}
-.hud-right{justify-content:flex-end}
-.hud>div>div{background:rgba(5,5,20,.6);padding:6px 8px;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(8px);font-weight:700;white-space:nowrap}
+button:focus-visible{outline:3px solid #fff;outline-offset:3px;box-shadow:0 0 24px currentColor}
+.settings{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+.settings button{margin:0;padding:9px 12px;min-height:42px;font-size:.7rem;letter-spacing:.08em}
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+body.reduced-motion *,body.reduced-motion *::before,body.reduced-motion *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.top-ui-stack{position:absolute;top:0;left:0;width:100%;padding:var(--safe-top) var(--safe-right) 8px var(--safe-left);display:flex;flex-direction:column;gap:6px;pointer-events:none;z-index:9}
+.hud{position:static;width:100%;display:grid;grid-template-columns:repeat(6,minmax(72px,1fr)) minmax(104px,1.15fr);gap:6px;align-items:stretch;pointer-events:none;font-size:clamp(.62rem,1.6vw,.95rem);letter-spacing:.06em}
+.hud-stat{min-width:0;width:100%;padding:7px 6px;background:rgba(5,5,20,.68);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(8px);font-weight:700;white-space:nowrap;text-align:center;overflow:hidden;text-overflow:ellipsis}
 .score{color:#00ffcc;border-color:#00ffcc44!important}
 .combo{color:#ffaa44;border-color:#ffaa4444!important}
 .lives{color:#ff4488;border-color:#ff448844!important}
 .shields-hud{color:#4488ff;border-color:#4488ff44!important}
 .arms-hud{color:#00ffff;border-color:#00ffff44!important}
 .pulse-hud{color:#aa88ff;border-color:#aa88ff44!important}
-.hud span{font-size:1.05em;margin-left:4px}
-.energy-bar{position:absolute;bottom:calc(var(--safe-bottom) + 16px);left:50%;transform:translateX(-50%);width:min(300px,calc(100vw - 32px));height:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);overflow:hidden;pointer-events:none;z-index:5}
+.hud span{display:block;font-size:1.08em;margin:2px 0 0}
+.meter-stack{position:absolute;bottom:calc(var(--safe-bottom) + 16px);left:50%;transform:translateX(-50%);width:min(300px,calc(100vw - 32px));display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none;z-index:5}
+.energy-bar{position:static;width:100%;height:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);overflow:hidden;pointer-events:none}
 .energy-fill{height:100%;background:linear-gradient(90deg,#00ffcc,#00aaff);transition:width .1s;box-shadow:0 0 20px #00ffcc}
-.pulse-bar{position:absolute;bottom:calc(var(--safe-bottom) + 36px);left:50%;transform:translateX(-50%);width:min(300px,calc(100vw - 32px));height:6px;background:rgba(255,255,255,.08);border:1px solid rgba(170,136,255,.3);overflow:hidden;pointer-events:none;z-index:5}
+.pulse-bar{position:static;width:100%;height:6px;background:rgba(255,255,255,.08);border:1px solid rgba(170,136,255,.3);overflow:hidden;pointer-events:none}
 .pulse-fill{height:100%;background:linear-gradient(90deg,#aa88ff,#ff44ff);transition:width .1s;box-shadow:0 0 15px #aa88ff}
-.energy-label{position:absolute;bottom:calc(var(--safe-bottom) + 29px);left:50%;transform:translateX(-50%);font-size:.7em;letter-spacing:.3em;opacity:.5;pointer-events:none;z-index:5}
+.energy-label{position:static;font-size:.7em;line-height:1;letter-spacing:.3em;opacity:.5;pointer-events:none}
 .hidden{display:none!important}
-.pause-button{position:absolute;top:calc(var(--safe-top) + 58px);right:var(--safe-right);z-index:9;margin:0;padding:8px 12px;min-height:40px;font-size:.72rem;color:#00ffcc;background:rgba(5,5,20,.8)}
+.pause-button{position:static;width:100%;height:100%;z-index:auto;margin:0;padding:7px 8px;min-height:0;font-size:.72rem;color:#00ffcc;background:rgba(5,5,20,.82);pointer-events:auto}
+#pauseScreen{background:#050510}
 .pause-panel{border-color:#00ffcc;color:#00ffcc}
 .pause-panel button{display:block;margin:14px auto 0}
 .touch-controls{position:absolute;inset:0;pointer-events:none;z-index:8}
@@ -53,14 +60,14 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
 .touch-action{width:82px;height:82px;margin:0;padding:0;border-radius:50%;font-size:.7rem;letter-spacing:.08em;background:#050514cc;touch-action:none}
 .touch-action.boost{color:#00ffcc}.touch-action.slow{color:#aa88ff}
 .touch-action.active{background:currentColor;color:#050510;transform:scale(.94);box-shadow:0 0 30px currentColor}
-.powerup-indicators{position:absolute;top:calc(var(--safe-top) + 53px);left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:none;z-index:5;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px)}
+.powerup-indicators{position:static;display:flex;gap:8px;pointer-events:none;flex-wrap:wrap;justify-content:center;width:100%}
 .pwr-ind{padding:5px 10px;border:1px solid;font-size:.7em;letter-spacing:.12em;background:rgba(5,5,20,.6);backdrop-filter:blur(8px);font-weight:700}
 .death-warning{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(92vw,560px);padding:0 10px;text-align:center;pointer-events:none;z-index:8}
 .death-warning .title{font-size:clamp(1.5rem,8vw,3rem);line-height:1.05;color:#ff0044;letter-spacing:clamp(.08em,1.5vw,.3em);text-shadow:0 0 40px #ff0044;font-weight:700;animation:deathPulse .5s infinite alternate;overflow-wrap:anywhere}
 .death-warning .countdown{font-size:clamp(3.4rem,18vw,6rem);line-height:1;color:#ff0044;text-shadow:0 0 60px #ff0044;font-weight:700}
 .death-warning .subtype{font-size:clamp(.75rem,3.5vw,1.3rem);color:#ff6600;letter-spacing:clamp(.1em,1vw,.25em);margin-top:10px;opacity:.8;overflow-wrap:anywhere}
 @keyframes deathPulse{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.05)}}
-.death-active-banner{position:absolute;top:calc(var(--safe-top) + 68px);left:50%;transform:translateX(-50%);max-width:calc(100vw - 24px);padding:8px 12px;border:2px solid;font-size:clamp(.65rem,2.5vw,.9rem);text-align:center;letter-spacing:clamp(.1em,1vw,.25em);font-weight:700;pointer-events:none;z-index:6;animation:deathPulse 1s infinite alternate;overflow-wrap:anywhere}
+.death-active-banner{position:static;width:max-content;max-width:100%;margin:0 auto;padding:8px 12px;border:2px solid;font-size:clamp(.65rem,2.5vw,.9rem);text-align:center;letter-spacing:clamp(.1em,1vw,.25em);font-weight:700;pointer-events:none;animation:deathPulse 1s infinite alternate;overflow-wrap:anywhere}
 .death-stats{position:absolute;bottom:calc(var(--safe-bottom) + 54px);left:50%;transform:translateX(-50%);font-size:.7em;color:#ff6600;letter-spacing:.15em;pointer-events:none;z-index:5;opacity:.7;text-align:center;max-width:calc(100vw - 24px)}
 .threshold-announce{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:min(92vw,620px);padding:0 10px;text-align:center;pointer-events:none;z-index:7;animation:fadeUp 2.5s forwards}
 .threshold-announce .title{font-size:clamp(1.5rem,7vw,2.5rem);line-height:1.1;letter-spacing:clamp(.1em,1vw,.25em);font-weight:700;text-shadow:0 0 30px currentColor;overflow-wrap:anywhere}
@@ -69,18 +76,15 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
 @media(max-width:600px){
  .panel{width:calc(100vw - 24px);padding:clamp(22px,6vw,32px) 16px}
  .menu h1,.gameover h1{font-size:clamp(2.15rem,12vw,3.25rem)}
- .hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;padding-left:8px;padding-right:8px}
- .hud-left,.hud-right{display:contents}
- .hud>div>div{min-width:0;width:100%;padding:7px 5px;text-align:center;overflow:hidden;text-overflow:ellipsis}
- .hud>div>div span{display:block;margin:2px 0 0;font-size:1.08em}
+ .top-ui-stack{padding-left:8px;padding-right:8px}
+ .hud{grid-template-columns:repeat(4,minmax(0,1fr));font-size:clamp(.6rem,2.2vw,.78rem)}
  .score{grid-column:1 / span 2}
  .combo{grid-column:3 / span 2}
+ .pause-button{grid-column:1 / -1;min-height:40px}
  .instructions div{margin:6px 0}
  .key{padding:3px 6px;margin:0 1px}
- .energy-bar{bottom:calc(var(--safe-bottom) + 154px);width:min(280px,calc(100vw - 32px))}
- .pulse-bar{bottom:calc(var(--safe-bottom) + 174px)}
- .energy-label{bottom:calc(var(--safe-bottom) + 167px)}
- .death-stats{bottom:calc(var(--safe-bottom) + 190px)}
+ .meter-stack{bottom:calc(var(--safe-bottom) + 154px);width:min(280px,calc(100vw - 32px))}
+ .death-stats{bottom:calc(var(--safe-bottom) + 198px)}
 }
 @media(max-height:620px){
  .panel{padding-top:16px;padding-bottom:16px}
@@ -89,39 +93,38 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
  button{margin-top:12px}
  .move-pad{width:112px;height:112px}
  .touch-action{width:70px;height:70px}
- .energy-bar{bottom:calc(var(--safe-bottom) + 128px)}
- .pulse-bar{bottom:calc(var(--safe-bottom) + 148px)}
- .energy-label{bottom:calc(var(--safe-bottom) + 141px)}
+ .meter-stack{bottom:calc(var(--safe-bottom) + 128px)}
 }
 @media(max-width:380px){
  .move-pad{width:120px;height:120px}
  .action-controls{flex-direction:column;gap:8px}
  .touch-action{width:66px;height:66px}
+ .meter-stack{bottom:calc(var(--safe-bottom) + 150px)}
 }
 </style>
 </head>
-<body onload="(function(s){function n(){if(!s.length)return;var e=document.createElement('scr'+'ipt');e.src=s.shift();e.onload=n;document.body.appendChild(e)}n()})(['game-core-1.js','game-core-2.js','touch-controls.js','bridge.js'])">
+<body onload="(function(s){function n(){if(!s.length)return;var e=document.createElement('scr'+'ipt');e.src=s.shift();e.onload=n;document.body.appendChild(e)}n()})(['game-rules.js','game-core-1.js','game-core-2.js','touch-controls.js','bridge.js'])">
 <div id="gameRoot">
 <canvas id="game"></canvas>
-<button class="pause-button hidden" id="pauseBtn" aria-label="Pause game">Ⅱ PAUSE</button>
-<div class="hud hidden" id="hud">
-    <div class="hud-left">
-        <div class="score">SCORE<span id="score">0</span></div>
-        <div class="combo">COMBO<span id="combo">0</span></div>
+<div class="top-ui-stack">
+    <div class="hud hidden" id="hud">
+        <div class="hud-stat score">SCORE<span id="score">0</span></div>
+        <div class="hud-stat combo">COMBO<span id="combo">0</span></div>
+        <div class="hud-stat arms-hud">ARMS<span id="armsDisplay">1</span></div>
+        <div class="hud-stat pulse-hud">PULSE<span id="pulseDisplay">0</span></div>
+        <div class="hud-stat shields-hud">SHIELDS<span id="shieldsDisplay">0</span></div>
+        <div class="hud-stat lives">LIVES<span id="lives">3</span></div>
+        <button class="pause-button hidden" id="pauseBtn" aria-label="Pause game">Ⅱ PAUSE</button>
     </div>
-    <div class="hud-right">
-        <div class="arms-hud">ARMS<span id="armsDisplay">1</span></div>
-        <div class="pulse-hud">PULSE<span id="pulseDisplay">0</span></div>
-        <div class="shields-hud">SHIELDS<span id="shieldsDisplay">0</span></div>
-        <div class="lives">LIVES<span id="lives">3</span></div>
-    </div>
+    <div class="powerup-indicators" id="powerupIndicators"></div>
+    <div id="deathBannerContainer"></div>
 </div>
-<div class="energy-label hidden" id="energyLabel">ENERGY</div>
-<div class="energy-bar hidden" id="energyBar"><div class="energy-fill" id="energyFill" style="width:100%"></div></div>
-<div class="pulse-bar hidden" id="pulseBar"><div class="pulse-fill" id="pulseFill" style="width:0%"></div></div>
-<div class="powerup-indicators" id="powerupIndicators"></div>
+<div class="meter-stack">
+    <div class="pulse-bar hidden" id="pulseBar" role="progressbar" aria-label="Pulse charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="pulse-fill" id="pulseFill" style="width:0%"></div></div>
+    <div class="energy-label hidden" id="energyLabel">ENERGY</div>
+    <div class="energy-bar hidden" id="energyBar" role="progressbar" aria-label="Blade energy" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="energy-fill" id="energyFill" style="width:100%"></div></div>
+</div>
 <div id="deathWarningContainer"></div>
-<div id="deathBannerContainer"></div>
 <div id="thresholdContainer"></div>
 <div class="overlay" id="menuScreen">
     <div class="panel menu">
@@ -137,6 +140,10 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
             Score thresholds unlock arms, pulses, and abilities.<br>
             Death Levels invert reality &mdash; collect shields to survive them.<br>
             Explosive tiles grant fiery chain reactions. Magnet tiles pull everything in.
+        </div>
+        <div class="settings" aria-label="Settings">
+            <button type="button" class="setting-toggle" data-setting="soundEnabled" aria-pressed="true">SOUND: ON</button>
+            <button type="button" class="setting-toggle" data-setting="reducedMotion" aria-pressed="false">REDUCED MOTION: OFF</button>
         </div>
         <button id="startBtn">BEGIN</button>
     </div>
@@ -154,20 +161,25 @@ button:hover{background:currentColor;color:#050510;box-shadow:0 0 40px currentCo
         <button id="restartBtn">REINITIALIZE</button>
     </div>
 </div>
-<div class="overlay hidden" id="pauseScreen" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+<div class="overlay hidden" id="pauseScreen" role="dialog" aria-labelledby="pauseTitle">
     <div class="panel pause-panel">
         <h1 id="pauseTitle">PAUSED</h1>
+        <div class="settings" aria-label="Settings">
+            <button type="button" class="setting-toggle" data-setting="soundEnabled" aria-pressed="true">SOUND: ON</button>
+            <button type="button" class="setting-toggle" data-setting="reducedMotion" aria-pressed="false">REDUCED MOTION: OFF</button>
+        </div>
         <button id="resumeBtn">RESUME</button>
         <button id="menuBtn">END RUN</button>
     </div>
 </div>
-<div class="touch-controls hidden" id="touchControls" aria-label="Touch game controls">
-    <div class="move-pad" id="movePad" role="application" aria-label="Movement pad"><div class="move-knob" id="moveKnob"></div></div>
+<div class="touch-controls hidden" id="touchControls" role="group" aria-label="Touch game controls">
+    <div class="move-pad" id="movePad" role="group" aria-label="Drag to move Guardian"><div class="move-knob" id="moveKnob"></div></div>
     <div class="action-controls">
         <button class="touch-action slow" id="slowTouchBtn" aria-label="Hold to slow blade">SLOW</button>
         <button class="touch-action boost" id="boostTouchBtn" aria-label="Hold to boost blade">BOOST</button>
     </div>
 </div>
+<div id="gameStatus" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 </div>
 </body>
 </html>

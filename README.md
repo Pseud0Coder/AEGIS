@@ -7,7 +7,7 @@ A monorepo for the AEGIS web and mobile versions.
 ## Project Structure
 
 - `web/` - Pure static deployment suitable for Vercel.
-- `mobile/` - Capacitor.js wrapper for Android with AdMob and IAP integration.
+- `mobile/` - Capacitor.js wrapper for Android with test-mode AdMob integration.
 
 ## Vercel Deployment
 
@@ -46,5 +46,18 @@ To build and test the Android APK using Capacitor, run the following commands fr
 
 ## Features Included
 
-- **Capacitor AdMob**: Shows a banner ad at the bottom of the screen (uses test ad ID). Automatically adjusts game canvas size so it does not block the UI.
-- **In-App Purchase**: "Remove Ads" button unlocks the premium tier and removes the AdMob banner permanently using `localStorage` caching (along with native IAP hooks).
+- **Capacitor AdMob**: The current Android integration uses Google's test banner configuration. Production ads require real AdMob app/ad-unit IDs, policy compliance, and store configuration.
+- **Purchases**: Play Billing and a remove-ads product are not currently implemented. Shipping either requires merchant and Play Console product configuration plus a verified native billing flow.
+
+## Tests and Shared Runtime
+
+`mobile/src` is canonical for `game-rules.js`, `game-core-1.js`, and `game-core-2.js`. From `mobile/`:
+
+```bash
+npm ci
+npm test
+npm run sync:shared
+npm run check:shared
+```
+
+The sync command copies the shared runtime to `web/` and, when that directory exists in the workspace, `../public/game/`. The check command exits nonzero if a copy has drifted.
